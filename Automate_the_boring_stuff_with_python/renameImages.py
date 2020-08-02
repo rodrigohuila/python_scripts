@@ -18,13 +18,18 @@ from os.path import basename
 
 pathFile = '/home/rodrigo/Downloads/Victoria/'
 ext = 'jpg'
+zipName = 'Diplomas.zip'
 
-def clear():
+
+def clear():  # BORRAR PANTALLA
     if os.name == "nt":
         os.system("cls")
     else:
         os.system("clear")
+
+
 clear()
+
 
 def openFile():  # DIALOG TO CHOOSE A FILE
     imageName = FileDialog.askopenfilename(
@@ -32,7 +37,7 @@ def openFile():  # DIALOG TO CHOOSE A FILE
         filetypes=(('pdf', '*.pdf'), ('all files', '*.*')),
         title='Escoja el archivo de imagen a dividir y renombrar'
     )
-    print('\nArchivo inicial: ' + basename(imageName) + '\n')
+    print('\nEl nombre del archivo inicial es: ' + basename(imageName) + '\n')
     return(imageName)
 
 
@@ -62,8 +67,17 @@ def read_image(cadena):  # READ LETTERS AND STRINGS IN THE IMAGE WITH GOOGLE OCR
 
     subcadena = cadena[startWord:endWord]
     newString = subcadena.lstrip("CERTIFICA QUE").lstrip("CERTIFICA").lstrip(
-        "QUE").lstrip(':').replace('\n', ' ').replace('.', '').strip().rstrip("CON UN").rstrip().rstrip().replace(' ', '_')
-    return(newString)
+        "QUE").lstrip(':').replace('\n', ' ').replace('.', '').replace('ASISTIO Y APROBO EL CURSO DE', 'Curso de').strip().rstrip("CON UN").rstrip().rstrip().replace(' ', '_').lower()
+
+    newString = newString.split('_')  # Split string to capitalize word by word
+    newString2 = []
+    for word in newString:
+        if len(word) > 2:
+            newString2.append(word.capitalize())
+        else:
+            newString2.append(word)
+    newString2 = '_'.join(newString2)
+    return(newString2)
 
 
 def rename_file(name, finalName):  # RENAME FILES
@@ -85,7 +99,7 @@ def convert_pdf(nameFile, finalName):  # CONVERT FILE FROM A SELECTED EXT TO PDF
 
 
 def compress_file(newExt):  # COMPRESS FILES IN A ZIP FILE
-    fileszip = zipfile.ZipFile(pathFile + 'Diplomas.zip', 'w')
+    fileszip = zipfile.ZipFile(pathFile + zipName, 'w')
 
     for file in os.listdir(pathFile):
         if file.endswith(newExt):
@@ -96,7 +110,7 @@ def compress_file(newExt):  # COMPRESS FILES IN A ZIP FILE
 
 def main():
     clear()
-    #system('clear') # para windows system("cls")
+    # system('clear') # para windows system("cls")
     fileList = convert_image(openFile(), pathFile, ext)
 
     os.chdir(pathFile)  # Go to the Directory
@@ -112,7 +126,7 @@ def main():
     print('\nTotal de archivo renombrados y comprimidos: ' + str(len(fileList)))
     #MessageBox.showinfo('Total de archivo renombrados y comprimidos:', str(len(fileList)) )
     compress_file('pdf')  # compress all pdf files
-    #shutil.openFile(pathFile)
-
+    
+    
 if __name__ == '__main__':
     main()
