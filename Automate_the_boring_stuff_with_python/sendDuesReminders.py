@@ -35,7 +35,7 @@ smtpObj.login('rodrigo.huila@gmail.com', sys.argv[1])
 for name, email in unpaidMembers.items():
     body = 'Subject: %s dues unpaid.\nDear %s,\nRecords show that you have not paid dues for %s. Please make this payment as soon as possible. Thank you!' % (latestMonth, name, latestMonth)
     print('Sending email to %s...' % email)
-    sendmailStatus = smtpObj.sendmail('my_email_address@gmail.com', email, body)
+    sendmailStatus = smtpObj.sendmail('rodrigo.huila@gmail.com', email, body)
 
     if sendmailStatus != {}:
         print('There was a problem sending email to %s: %s' % (email, sendmailStatus))

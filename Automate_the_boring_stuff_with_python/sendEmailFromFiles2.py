@@ -50,12 +50,12 @@ def search_files(names):
     Return a list of names of files to attach to the msg
     """
     files = []
-    
+    #Search the names agaitns the files in the directory
     for i in range (0, len(names)):
         check = False    
         for filename in os.listdir(PATH):
             name = names[i].lower()
-            name = name[0:10]
+            #name = name[0:10]
             if filename.endswith(ext):
                 fileNewName = str(filename)
                 fileNewName = fileNewName.replace('_', ' ')
@@ -81,6 +81,7 @@ def main():
     s = smtplib.SMTP(host='smtp.gmail.com', port=587)
     s.starttls()
     s.login(MY_ADDRESS, PASSWORD)
+    #Iniciar la varaible i en ceros
     i = 0
 
     # FOR EACH CONTACT, SEND THE EMAIL:
@@ -91,8 +92,8 @@ def main():
         message = message_template.substitute(PERSON_NAME=name.title())
 
         # Prints out the message body for our sake
-        print(message)
-
+        #print(message)
+        
         # setup the parameters of the message
         msg['From'] = MY_ADDRESS
         msg['To'] = email
@@ -102,8 +103,6 @@ def main():
         msg.attach(MIMEText(message, 'plain'))
 
         #ATTACH FILES TO THE EMAIL
-        #Directorio donde esta el archivo a adjuntar
-        
         #search_files(names) #'test.pdf'
         filename = attach[i]
         if filename != None:
@@ -122,17 +121,28 @@ def main():
             )
             # Add attachment to message and convert message to string
             msg.attach(part)
+
             #text = message.as_string()
             # SEND THE MESSAGE WITH ATTACHED.
-            s.send_message(msg)
+            sendmailStatus = s.send_message(msg)
             del msg
+                       
+            #Status message sent
+            if sendmailStatus != {}:
+                print ('There was a problem sending the email to %s: %s' %
+                        (email, s.send_message))
+            else:            
+                print ('\nThe email to %s was sent correctly with the attached:\n%s' % (email, attach[i]))
+                
+
             i = (i + 1)
         else: 
             # SEND THE MESSAGE WITHOUT ATTACHED.
-            s.send_message(msg)
+            #s.send_message(msg)
             del msg
+            #Do not send a message
             i = (i + 1)
-
+        
     # Terminate the SMTP session and close the connection
     s.quit()
 

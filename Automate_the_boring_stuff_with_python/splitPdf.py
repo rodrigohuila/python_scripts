@@ -4,6 +4,7 @@ import os
 import PyPDF2
 
 path = '/home/rodrigo/Downloads/'
+path2 = '/home/rodrigo/Downloads/Victoria'
 contentAll = ''
 
 print('\nDigite el nombre del Documento:')
@@ -36,7 +37,7 @@ def pdf_splitter(pathpdfName):
         pdfWriter.addPage(pageObj)
         output_filename = 'page_{}_{}'.format(
             pageNum+1, pdfName)
-        os.chdir('/home/rodrigo/Downloads/Victoria')
+        os.chdir(path2)
         with open(output_filename, 'wb') as out:
             pdfWriter.write(out)
         print('Created: {}'.format(output_filename))
