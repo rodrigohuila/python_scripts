@@ -16,19 +16,15 @@ from tkinter import messagebox as MessageBox
 from os import system
 from os.path import basename
 
-pathFile = '/home/rodrigo/Downloads/Victoria/'
-ext = 'jpg'
-zipName = 'Diplomas.zip'
+pathFile = '/home/rodrigo/Downloads/Victoria/' # Directory for the final files
+ext = 'jpg' # File Ext
 
 
-def clear():  # BORRAR PANTALLA
-    if os.name == "nt":
+def clear():  # ERASE SCREEN
+    if os.name == "nt":      # Windows
         os.system("cls")
     else:
-        os.system("clear")
-
-
-clear()
+        os.system("clear")   # Linux
 
 
 def openFile():  # DIALOG TO CHOOSE A FILE
@@ -41,7 +37,7 @@ def openFile():  # DIALOG TO CHOOSE A FILE
     return(imageName)
 
 
-def convert_image(imageName, pathFile, ext):  # CONVERT IMAGEN A SELECT EXT
+def convert_image(imageName, pathFile, ext):  # CONVERT IMAGEN TO A SELECT EXT
     lstFiles = []
     convert_from_path(imageName, output_folder=pathFile,
                       fmt=ext, output_file='Diploma')
@@ -61,9 +57,8 @@ def ocr_core(fileName):  # OCR PROCESSING OF IMAGES
 
 def read_image(cadena):  # READ LETTERS AND STRINGS IN THE IMAGE WITH GOOGLE OCR
     startWord = cadena.index(
-        'CERTIFICA')  # Ingresamos el texto inicial de la búsqueda
-    # Ingresamos el texto final de la búsqueda
-    endWord = cadena.index('CON UNA')
+        'CERTIFICA')  # Initial text for the search
+    endWord = cadena.index('CON UNA') # Final text for the search
 
     subcadena = cadena[startWord:endWord]
     newString = subcadena.lstrip("CERTIFICA QUE").lstrip("CERTIFICA").lstrip(
@@ -88,9 +83,8 @@ def rename_file(name, finalName):  # RENAME FILES
 
 
 def convert_pdf(nameFile, finalName):  # CONVERT FILE FROM A SELECTED EXT TO PDF
-    image = Image.open(nameFile)  # opening image
-    # converting into chunks using img2pdf
-    pdf_bytes = img2pdf.convert(image.filename)
+    image = Image.open(nameFile)  # opening image file
+    pdf_bytes = img2pdf.convert(image.filename) # converting into chunks using img2pdf
     file = open(finalName + ".pdf", "wb")  # opening or creating pdf file
     file.write(pdf_bytes)  # writing pdf files with chunks
     image.close()  # closing image file
@@ -98,7 +92,8 @@ def convert_pdf(nameFile, finalName):  # CONVERT FILE FROM A SELECTED EXT TO PDF
     print("Successfully made pdf file: " + file.name)  # output
 
 
-def compress_file(newExt):  # COMPRESS FILES IN A ZIP FILE
+def compress_file(imageName, newExt):  # COMPRESS FILES IN A ZIP FILE
+    zipName = basename(imageName) + '.zip' #Name of the original file
     fileszip = zipfile.ZipFile(pathFile + zipName, 'w')
 
     for file in os.listdir(pathFile):
@@ -110,22 +105,21 @@ def compress_file(newExt):  # COMPRESS FILES IN A ZIP FILE
 
 def main():
     clear()
-    # system('clear') # para windows system("cls")
-    fileList = convert_image(openFile(), pathFile, ext)
+    imageName = openFile() # Name of the file to split
+    fileList = convert_image(imageName, pathFile, ext)
 
     os.chdir(pathFile)  # Go to the Directory
     for i in range(0, len(fileList)):
         allTextfromImage = ocr_core(fileList[i])  # All text
         subText = read_image(allTextfromImage)  # Only text with need
         #print('\nEsta es la cadena substraída de la imagen:\n' + subText + '\n')
-        # Rename image file with text
-        imageFile = rename_file(fileList[i], subText)
+        imageFile = rename_file(fileList[i], subText) # Rename image file with text
         convert_pdf(imageFile, subText)  # convert to PDF again
         os.unlink(imageFile)  # Erase the images files using shutil module
 
     print('\nTotal de archivo renombrados y comprimidos: ' + str(len(fileList)))
     #MessageBox.showinfo('Total de archivo renombrados y comprimidos:', str(len(fileList)) )
-    compress_file('pdf')  # compress all pdf files
+    compress_file(imageName, 'pdf')  # compress all pdf files
     
     
 if __name__ == '__main__':
